@@ -43,6 +43,21 @@ app.get('/api/persons/:id', (request, response) => {
     response.status(200).json(person)
 })
 
+const generateRandomId = ()  => {
+    return Math.floor(Math.random() * 800000)
+}
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    const newPerson = {
+        id: generateRandomId(),
+        name: body.name,
+        number: body.number,
+    }
+    persons = persons.concat(newPerson)
+    response.status(201).json(newPerson)
+})
+
 app.delete('/api/persons/:id', (request, response) => {
     const {id} = request.params
     const person = persons.find((p) => p.id === Number(id)) 
