@@ -36,12 +36,23 @@ app.get('/api/persons', (request, response) => {
 app.get('/api/persons/:id', (request, response) => {
     const {id} = request.params
     const person = persons.find((p) => p.id === Number(id))
-    console.log(person); 
     if(!person)
     {
-        response.status(404).json({message: `the ${id} person not found on the phonebook`})
+        response.status(404).json({message: `the ${id} person has not been found on the phonebook`})
     }
     response.status(200).json(person)
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+    const {id} = request.params
+    const person = persons.find((p) => p.id === Number(id)) 
+    if(!person)
+    {
+        response.status(404).json({message: `the ${id} person has not been found on the phonebook`})
+    }
+     persons = persons.filter((p) => p.id !== Number(id))
+    
+     response.status(204).json({message:`Person ${id} has been removed`})
 })
 
 app.get('/api/info', (request, response) => {
