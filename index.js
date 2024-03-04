@@ -33,7 +33,16 @@ app.get('/api/persons', (request, response) => {
     response.status(200).json(persons)
 })
 
-
+app.get('/api/persons/:id', (request, response) => {
+    const {id} = request.params
+    const person = persons.find((p) => p.id === Number(id))
+    console.log(person); 
+    if(!person)
+    {
+        response.status(404).json({message: `the ${id} person not found on the phonebook`})
+    }
+    response.status(200).json(person)
+})
 
 app.get('/api/info', (request, response) => {
     
