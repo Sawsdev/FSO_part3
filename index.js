@@ -50,13 +50,13 @@ const generateRandomId = ()  => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
     if (!body.number || !body.name) {
-        response.status(406).json({error: "name and number are required"})
+        response.status(406).json({error: "name and number are required"}).end()
         
     }
 
     const person = persons.find((p) => p.name.toLowerCase().includes(body.name.toLowerCase()))
     if (person) {
-        response.status(409).json({error: "name must be unique"})
+        response.status(409).json({error: "name must be unique"}).end()
     }
     const newPerson = {
         id: generateRandomId(),
