@@ -42,17 +42,23 @@ app.post('/api/persons', (request, response) => {
         
     }
 
-    const person = persons.find((p) => p.name.toLowerCase().includes(body.name.toLowerCase()))
-    if (person) {
-        response.status(409).json({error: "name must be unique"}).end()
-    }
-    const newPerson = {
-        id: generateRandomId(),
+    // const person = persons.find((p) => p.name.toLowerCase().includes(body.name.toLowerCase()))
+    // if (person) {
+    //     response.status(409).json({error: "name must be unique"}).end()
+    // }
+    // const newPerson = {
+    //     id: generateRandomId(),
+    //     name: body.name,
+    //     number: body.number,
+    // }
+    const person = new Person({
         name: body.name,
-        number: body.number,
-    }
-    persons = persons.concat(newPerson)
-    response.status(201).json(newPerson)
+        number: body.number,       
+    })
+    person.save().then(createdPerson => {
+        
+        response.status(201).json(createdPerson)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
