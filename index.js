@@ -30,14 +30,19 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const {id} = request.params
-    const person = persons.find((p) => p.id === Number(id))
-    if(!person)
-    {
-        response.status(404).json({message: `the ${id} person has not been found on the phonebook`})
-    }
-    response.status(200).json(person)
+    Person.findById(id)
+          .then(person => {
+              if(!person)
+              {
+                  response.status(404).json({message: `the ${id} person has not been found on the phonebook`})
+              }
+              response.status(200).json(person)
+
+          })
+          .catch(error => next(error))
+    
 })
 
 const generateRandomId = ()  => {
@@ -98,12 +103,14 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/api/info', (request, response) => {
-    
-    const peopleCount = persons.length
-    const currentDate = new Date().toString()
+    Person.find({}).then(persons => {
+        
+        const peopleCount = persons.length
+        const currentDate = new Date().toString()
+        response.status(200).send(`<p>Phonebook has info for ${peopleCount} people</p>
+        <p>${currentDate}</p>`)
+    })
 
-    response.status(200).send(`<p>Phonebook has info for ${peopleCount} people</p>
-    <p>${currentDate}</p>`)
 })
 
 
