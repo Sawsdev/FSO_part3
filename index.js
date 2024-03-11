@@ -13,7 +13,16 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(express.static("dist"))
 
+const errorHandlingMiddleware = (error, request, response, next) => {
+    console.error(error.message);
 
+    if( error.name === 'CastError')
+    {
+        response.status(400).send({error: "Malformatted id"})
+    }
+
+    next(error)
+}
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
@@ -61,17 +70,14 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const {id} = request.params
     Person.findByIdAndDelete(id)
           .then(result => {
             
             response.status(204).end()
           })
-          .catch(error => {
-            console.error(error.message);
-            response.status(400).send({error: "malformatted id"})
-          })
+          .catch(error => next(error))
     
 })
 
@@ -84,6 +90,8 @@ app.get('/api/info', (request, response) => {
     <p>${currentDate}</p>`)
 })
 
+
+app.use(errorHandlingMiddleware)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
