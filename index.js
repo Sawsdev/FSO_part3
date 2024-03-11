@@ -63,14 +63,16 @@ app.post('/api/persons', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
     const {id} = request.params
-    const person = persons.find((p) => p.id === Number(id)) 
-    if(!person)
-    {
-        response.status(404).json({message: `the ${id} person has not been found on the phonebook`})
-    }
-     persons = persons.filter((p) => p.id !== Number(id))
+    Person.findByIdAndDelete(id)
+          .then(result => {
+            
+            response.status(204).end()
+          })
+          .catch(error => {
+            console.error(error.message);
+            response.status(400).send({error: "malformatted id"})
+          })
     
-     response.status(204).json({message:`Person ${id} has been removed`})
 })
 
 app.get('/api/info', (request, response) => {
