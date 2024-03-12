@@ -20,6 +20,10 @@ const errorHandlingMiddleware = (error, request, response, next) => {
     {
         response.status(400).send({error: "Malformatted id"})
     }
+    else if( error.name === 'ValidationError' )
+    {
+        response.status(400).json({error: error.message})
+    }
 
     next(error)
 }
@@ -49,7 +53,7 @@ const generateRandomId = ()  => {
     return Math.floor(Math.random() * 800000)
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
     if (!body.number || !body.name) {
         response.status(406).json({error: "name and number are required"}).end()
@@ -69,10 +73,13 @@ app.post('/api/persons', (request, response) => {
         name: body.name,
         number: body.number,       
     })
-    person.save().then(createdPerson => {
+    person.save()
+    .then(createdPerson => {
         
         response.status(201).json(createdPerson)
     })
+    .catch(error => next(error))
+
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -93,7 +100,11 @@ app.put('/api/persons/:id', (request, response, next) => {
         name,
         number
     }
-    Person.findByIdAndUpdate(id, person, {new: true})
+    Person.findByIdAndUpdate(
+            id, 
+            person, 
+            {new: true, runValidators: true, context: 'query'}
+            )
           .then(updatedPerson => {
             
             response.json(updatedPerson)
